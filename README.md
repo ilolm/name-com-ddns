@@ -27,6 +27,7 @@ version: "3"
 services:
   name-com-ddns:
     image: ilolm/name-com-ddns
+    restart: unless-stopped
     environment:
       - USERNAME=myusername
       - TOKEN=mytoken1234567890
