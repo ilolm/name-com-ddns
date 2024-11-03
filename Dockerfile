@@ -1,20 +1,20 @@
-FROM alpine:latest
-MAINTAINER iam@lowiehuyghe.com
+FROM alpine:3.20.3
+
+LABEL org.opencontainers.image.authors="Nikolay Ogorodnik <Ilolm@proton.me>, Lowie Huyghe <iam@lowiehuyghe.com>" \
+      org.opencontainers.image.description="Dynamic DNS for name.com ."
 
 # Setup source code
 WORKDIR /opt/name-com-ddns
+
+RUN echo "Installing dependencies." \
+    && apk update --no-cache \
+    && apk add --no-cache curl jq && \
+
+    echo "Setup cron." \
+    && echo '*/5  *  *  *  *    cd /opt/name-com-ddns && ./run.sh > /dev/null' > /var/spool/cron/crontabs/root
+
 COPY ./src ./src/
 COPY ./run.sh ./
-RUN ls /opt/name-com-ddns/src
-RUN ls /opt/name-com-ddns/run.sh
-
-# Install dependencies
-RUN apk add --no-cache \
-  curl \
-  jq
-
-# Setup cron
-RUN echo '*/15  *  *  *  *    cd /opt/name-com-ddns && ./run.sh > /dev/null' > /var/spool/cron/crontabs/root
 
 # Run the command on container startup
-CMD crond -f -l 9
+ENTRYPOINT ["crond", "-f", "-l", "9"]
